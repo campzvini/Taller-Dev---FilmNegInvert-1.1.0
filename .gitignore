@@ -1,0 +1,56 @@
+# Build directories
+build/
+bin/
+lib/
+out/
+dist/
+package/
+
+# Visual Studio
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.user
+*.vcxproj.filters
+*.suo
+*.pdb
+*.ipch
+*.iobj
+*.tlog
+
+# C++ Objects and binaries
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+*.lib
+*.exp
+*.ilk
+
+# OpenFX specific
+*.ofx
+*.ofx.bundle/Contents/MacOS/
+*.ofx.bundle/Win64/
+*.ofx.bundle/Linux-x86-64/
+
+# Distribution packages
+*.zip
+FilmNegInvert-*.zip
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
+
+# External dependencies
+dev/openfx/
+
+# Internal documentation (not for public repository)
+AGENTS.md
+CHANGELOG.md
+
+# Temporary scripts
+fix_cuda.ps1

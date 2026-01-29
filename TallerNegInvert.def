@@ -1,0 +1,4 @@
+LIBRARY TallerNegInvert
+EXPORTS
+	OfxGetPlugin
+	OfxGetNumberOfPlugins
