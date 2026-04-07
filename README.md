@@ -52,7 +52,7 @@ O repositorio foi preparado para distribuicao direta. O fluxo esperado e:
 1. baixar o repositorio do GitHub;
 2. extrair ou clonar;
 3. executar `installer.bat`;
-4. aceitar a elevacao de privilegio;
+4. aceitar privelegio de admin;
 5. abrir o DaVinci Resolve.
 
 O instalador usa primeiro o binario publico versionado em:
@@ -287,3 +287,6 @@ If you generate a new public distributable build, refresh:
 ### License
 
 This repository includes the plugin code and a vendored copy of the OpenFX support framework under `external/openfx`. Before publishing forks, releases, or derived packages, review the licenses of the included components.
+
+
+VAI CORINTHIANS!!
