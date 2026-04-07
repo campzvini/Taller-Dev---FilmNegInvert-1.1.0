@@ -1,124 +1,289 @@
-# **Film Neg Invert \- Plugin OpenFX para DaVinci Resolve**
+# Film Neg Invert
 
-Taller Dev \- 2026
+OpenFX plugin for DaVinci Resolve focused on practical film negative inversion on Windows.
 
-O **Film Neg Invert** é um plugin OpenFX (OFX) de alta precisão desenvolvido para o **DaVinci Resolve (Windows)**, projetado especificamente para a inversão e reconstrução radiométrica de negativos de cinema digitalizados. Diferente de ferramentas de inversão genéricas, este plugin implementa um pipeline científico que respeita as curvas sensitométricas e a física das emulsões cinematográficas, com foco nas famílias **Kodak Vision3** e **Eastman Double-X**.
+Taller Lab: https://tallerlab.com/
 
-## ---
+## PT-BR
 
-**Principais Recursos**
+English version bellow.
 
-* **Pipeline Científico**: Subtração da máscara laranja (D-min) e linearização baseada em dados técnicos oficiais da Kodak.  
-* **Análise de Máscara**: Algoritmo para detecção e neutralização da base de acetato do filme.  
-* **Versatilidade de Entrada**: Suporte para fluxos de trabalho Lineares (Scans RAW) e Logarítmicos (Cineon/DPX).  
-* **Presets de Emulsão**: Otimizações para Kodak Vision3 50D, 250D, 200T, 500T e Eastman Double-X 5222\.  
-* **Performance**: Código C++ otimizado para processamento de sequências em resoluções 4K e 8K.
+### O que e
 
-## ---
+`Film Neg Invert` e um plugin OFX para DaVinci Resolve voltado para inversao tecnica de negativos digitalizados. A proposta do projeto nao e simular um laboratorio fotoquimico completo. O foco e oferecer um pipeline pratico, reproduzivel e rapido para:
 
-**Instalacao**
+- neutralizar a base colorida do negativo;
+- ajustar a resposta tonal;
+- inverter para positivo;
+- trabalhar em lotes grandes de frames.
 
-### **Requisitos de Sistema**
+### Agradecimentos e referencia de pesquisa
 
-* **Sistema Operacional**: Windows 10/11 (64-bit).  
-* **Software Host**: DaVinci Resolve 17 ou superior.  
-* **Hardware**: Processador com suporte ao conjunto de instruções SSE4.2.
+Este projeto foi iniciado durante o estudo do projeto `kaliscope`, de Eloi du Bois:
 
-### **Instalacao Automatica (Recomendada)**
+https://github.com/edubois/kaliscope
 
-1. Baixe o arquivo comprimido da versao estavel em Releases.  
-2. Extraia o conteudo para a pasta raiz do projeto.  
-3. Clique com o botao direito no arquivo install.bat e selecione **Executar como administrador**.  
-4. O script criara automaticamente a estrutura de diretorios e instalara o plugin no local correto.
+O `kaliscope` foi uma referencia importante de pesquisa e contexto tecnico, servindo de grande auxilio para o desenvolvimento de processos fotoquimicos no Brasil. 
 
-### **Instalacao Manual**
+### Estado real da versao 1.1.0
 
-1. Baixe o pacote do plugin.  
-2. Mova a pasta do bundle para o diretorio padrao de plugins OFX do Windows: C:\\Program Files\\Common Files\\OFX\\Plugins\\FilmNegInvert.ofx.bundle\\Contents\\Win64\\  
-3. Certifique-se de que o arquivo FilmNegInvert.ofx esteja dentro da subpasta Win64.
+- Windows apenas.
+- Plugin OpenFX para DaVinci Resolve.
+- Suporte a `RGB` e `RGBA`.
+- Suporte a `8-bit`, `16-bit` e `32-bit float`.
+- Render em CPU com multithreading por faixas de linhas.
+- Caminho inteiro (`8/16-bit`) otimizado com LUT.
+- Caminho `float` com LUT interpolada na faixa principal e fallback matematico acima da faixa da LUT.
+- Entrada `Linear (RAW)` e `Log (Cineon/DPX)`.
+- Presets praticos para `Vision3 (Color)` e `Double-X (B&W)`.
+- `Double-X` forca saida monocromatica.
+- Sem processamento GPU no estado atual.
+- Sem analise automatica de mascara no estado atual.
+- Projeto em fase de testes enquanto avaliamos uma futura implementacao de GPU.
 
-### **Pos-Instalacao**
+### Nota de desenvolvimento
 
-1. Reinicie o DaVinci Resolve.  
-2. O plugin estara disponivel na biblioteca de efeitos em **Color \> OpenFX**.
+Projeto desenvolvido com auxilio de Codex, GLM-4.7 e DeepSeek, com direcao, integracao e validacao final do Taller Lab.
 
-## ---
+### Instalacao rapida
 
-**Desenvolvimento e Build**
+O repositorio foi preparado para distribuicao direta. O fluxo esperado e:
 
-O projeto utiliza o padrão C++17 e o sistema CMake 3.18+ para garantir compatibilidade binária com o DaVinci Resolve.
+1. baixar o repositorio do GitHub;
+2. extrair ou clonar;
+3. executar `installer.bat`;
+4. aceitar a elevacao de privilegio;
+5. abrir o DaVinci Resolve.
 
-\# Configuracao do ambiente de build  
-mkdir build && cd build  
-cmake .. \-DCMAKE\_BUILD\_TYPE=Release \-DOFX\_ROOT=C:/dev/openfx  
-cmake \--build . \--config Release
+O instalador usa primeiro o binario publico versionado em:
+
+`dist\FilmNegInvert.ofx`
+
+Depois ele instala o plugin em:
+
+`C:\Program Files\Common Files\OFX\Plugins\FilmNegInvert.ofx.bundle\Contents\Win64\FilmNegInvert.ofx`
+
+O icone do plugin fica em:
+
+`C:\Program Files\Common Files\OFX\Plugins\FilmNegInvert.ofx.bundle\Contents\Resources\com.tallerneg.FilmNegInvert.png`
+
+### Requisitos
+
+- Windows 10 ou 11 64-bit
+- DaVinci Resolve com suporte a OpenFX
+- permissao de administrador para escrever em `Program Files`
+
+O binario distribuido usa runtime estatico do MSVC. Na pratica, isso evita dependencia separada do Visual C++ Redistributable na maquina de destino.
+
+### Controles atuais
+
+- `Mask Color`
+- `Film Gamma`
+- `Exposure`
+- `Input Type`
+- `Film Type`
+- `Red Factor`
+- `Green Factor`
+- `Blue Factor`
+- `Color Invert`
+- `Reset`
+
+### Documentacao publica
+
+- [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
+- [docs/ALGORITHM_AND_INTERNALS.md](docs/ALGORITHM_AND_INTERNALS.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+
+### Estrutura publica do projeto
+
+```text
+/
+  README.md
+  CONTRIBUTING.md
+  LICENSE
+  installer.bat
+  CMakeLists.txt
+  CMakeSettings.json
+  TallerNegInvert.def
+  dist/
+    FilmNegInvert.ofx
+  docs/
+    USER_GUIDE.md
+    ALGORITHM_AND_INTERNALS.md
+  external/
+    openfx/
+  include/
+    FilmNegInvertPlugin.h
+    FilmNegInvertPluginFactory.h
+  Resources/
+    com.tallerneg.FilmNegInvert.png
+  src/
+    FilmNegInvertPlugin.cpp
+    FilmNegInvertPluginFactory.cpp
+    mainEntry.cpp
+```
+
+### Build para desenvolvimento
+
+Build principal:
+
+```powershell
+cmake -S . -B out/build/x64-Release -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build out/build/x64-Release --config RelWithDebInfo
+```
+
+Se faltar ambiente do MSVC:
+
+```powershell
+cmd /c "call \"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat\" -arch=x64 && cmake --build out\build\x64-Release --config RelWithDebInfo"
+```
+
+Se voce gerar uma nova versao para distribuicao publica, atualize:
+
+`dist\FilmNegInvert.ofx`
+
+### Licenca
+
+Este repositorio inclui o codigo do plugin e uma copia vendorizada do OpenFX support framework em `external/openfx`. Antes de publicar forks, releases ou pacotes derivados, revise as licencas dos componentes incluidos.
 
 ---
 
-**Referencias e Agradecimentos**   
-Este projeto foi inspirado e utilizou conceitos fundamentais do projeto kaliscope, desenvolvido por Eloi DU BOIS (licença GNU GPL v3) disponibilizado pelo filmlabs.org. Reconhecemos o valor técnico do kaliscope na compreensão de remoção de máscaras coloridas e conversões RGB/YUV para preservação fílmica.
+## EN
 
-# ---
+### What it is
 
-**Film Neg Invert \- OpenFX Plugin for DaVinci Resolve**
+`Film Neg Invert` is an OFX plugin for DaVinci Resolve focused on practical technical inversion of scanned film negatives. The goal is not to simulate a full photochemical lab. The project is built to provide a practical, reproducible, and fast pipeline for:
 
-**Film Neg Invert** is a high-precision OpenFX (OFX) plugin for **DaVinci Resolve (Windows)**, purpose-built for the inversion and radiometric reconstruction of scanned motion picture film negatives. This plugin implements a scientific pipeline that respects sensitometric curves and the physics of cinema emulsions, specifically targeting the **Kodak Vision3** and **Eastman Double-X** families.
+- neutralizing the film base color;
+- shaping tonal response;
+- inverting to a positive image;
+- processing large frame batches.
 
-## ---
+### Acknowledgements and research reference
 
-**Key Features**
+This project started while studying `kaliscope`, by Eloi du Bois:
 
-* **Scientific Pipeline**: D-min (orange mask) subtraction and linearization based on official Kodak technical data.  
-* **Mask Analysis**: Advanced algorithm for detection and neutralization of the film acetate base.  
-* **Input Versatility**: Native support for both Linear (RAW Scans) and Logarithmic (Cineon/DPX) workflows.  
-* **Dedicated Presets**: Specific optimizations for Vision3 (Color) and Double-X (B\&W) film stocks.  
-* **Performance**: Optimized C++ codebase capable of handling 4K and 8K image sequences.
+https://github.com/edubois/kaliscope
 
-## ---
+`kaliscope` was an important research and technical reference, providing major support for the development of photochemical processes in Brazil.
 
-**Installation**
+### Real state of version 1.1.0
 
-### **System Requirements**
+- Windows only.
+- OpenFX plugin for DaVinci Resolve.
+- Supports `RGB` and `RGBA`.
+- Supports `8-bit`, `16-bit`, and `32-bit float`.
+- CPU rendering with row-sliced multithreading.
+- Optimized integer path (`8/16-bit`) using LUTs.
+- `float` path with interpolated LUT over the main range and direct math fallback above the LUT range.
+- `Linear (RAW)` and `Log (Cineon/DPX)` input modes.
+- Practical presets for `Vision3 (Color)` and `Double-X (B&W)`.
+- `Double-X` forces monochrome output.
+- No GPU processing in the current version.
+- No automatic mask analysis in the current version.
+- The project is currently in testing while we evaluate a future GPU implementation.
 
-* **OS**: Windows 10/11 (64-bit).  
-* **Host Software**: DaVinci Resolve 17 or higher.  
-* **Hardware**: CPU with SSE4.2 instruction set support.
+### Development note
 
-### **Automatic Installation (Recommended)**
+This project was developed with assistance from Codex, GLM-4.7, and DeepSeek, with final direction, integration, and validation by Taller Lab.
 
-1. Download the latest stable package from the Releases tab.  
-2. Extract the files to the project root folder.  
-3. Right-click the install.bat file and select **Run as administrator**.  
-4. The script will automatically generate the required directory structure and install the plugin to the correct path.
+### Quick install
 
-### **Manual Installation**
+The repository is prepared for direct distribution. The intended flow is:
 
-1. Download the plugin package.  
-2. Move the bundle folder to the system's standard OFX plugin directory: C:\\Program Files\\Common Files\\OFX\\Plugins\\FilmNegInvert.ofx.bundle\\Contents\\Win64\\  
-3. Ensure the FilmNegInvert.ofx file is correctly placed inside the Win64 subfolder.
+1. download the repository from GitHub;
+2. extract or clone it;
+3. run `installer.bat`;
+4. accept the elevation prompt;
+5. open DaVinci Resolve.
 
-### **Post-Installation**
+The installer first uses the public versioned binary stored at:
 
-1. Restart DaVinci Resolve.  
-2. The plugin will be located in the effects library under **Color \> OpenFX**.
+`dist\FilmNegInvert.ofx`
 
-## ---
+Then it installs the plugin to:
 
-**Development and Build**
+`C:\Program Files\Common Files\OFX\Plugins\FilmNegInvert.ofx.bundle\Contents\Win64\FilmNegInvert.ofx`
 
-The project leverages C++17 and CMake 3.18+ to ensure stability and ABI compatibility with the host application.
+The plugin icon is installed to:
 
-\# Build configuration  
-mkdir build && cd build  
-cmake .. \-DCMAKE\_BUILD\_TYPE=Release \-DOFX\_ROOT=C:/dev/openfx  
-cmake \--build . \--config Release
+`C:\Program Files\Common Files\OFX\Plugins\FilmNegInvert.ofx.bundle\Contents\Resources\com.tallerneg.FilmNegInvert.png`
 
-## ---
+### Requirements
 
-**Acknowledgments**
+- Windows 10 or 11 64-bit
+- DaVinci Resolve with OpenFX support
+- administrator permissions to write into `Program Files`
 
-This project was inspired by and utilized fundamental concepts from the kaliscope project, developed by Eloi DU BOIS (GNU GPL v3 license) made available by filmlabs.org. We recognize the technical value of kaliscope in the understanding of colored mask removal and RGB/YUV conversions for film preservation.
+The distributed binary uses the static MSVC runtime. In practice, this avoids a separate Visual C++ Redistributable dependency on the target machine.
 
----
+### Current controls
 
-**VAI CORINTHIANS\!\!** ⚫⚪
+- `Mask Color`
+- `Film Gamma`
+- `Exposure`
+- `Input Type`
+- `Film Type`
+- `Red Factor`
+- `Green Factor`
+- `Blue Factor`
+- `Color Invert`
+- `Reset`
+
+### Public documentation
+
+- [docs/USER_GUIDE.md](docs/USER_GUIDE.md)
+- [docs/ALGORITHM_AND_INTERNALS.md](docs/ALGORITHM_AND_INTERNALS.md)
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+
+### Public project layout
+
+```text
+/
+  README.md
+  CONTRIBUTING.md
+  LICENSE
+  installer.bat
+  CMakeLists.txt
+  CMakeSettings.json
+  TallerNegInvert.def
+  dist/
+    FilmNegInvert.ofx
+  docs/
+    USER_GUIDE.md
+    ALGORITHM_AND_INTERNALS.md
+  external/
+    openfx/
+  include/
+    FilmNegInvertPlugin.h
+    FilmNegInvertPluginFactory.h
+  Resources/
+    com.tallerneg.FilmNegInvert.png
+  src/
+    FilmNegInvertPlugin.cpp
+    FilmNegInvertPluginFactory.cpp
+    mainEntry.cpp
+```
+
+### Development build
+
+Main build:
+
+```powershell
+cmake -S . -B out/build/x64-Release -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+cmake --build out/build/x64-Release --config RelWithDebInfo
+```
+
+If the MSVC environment is missing:
+
+```powershell
+cmd /c "call \"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat\" -arch=x64 && cmake --build out\build\x64-Release --config RelWithDebInfo"
+```
+
+If you generate a new public distributable build, refresh:
+
+`dist\FilmNegInvert.ofx`
+
+### License
+
+This repository includes the plugin code and a vendored copy of the OpenFX support framework under `external/openfx`. Before publishing forks, releases, or derived packages, review the licenses of the included components.

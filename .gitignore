@@ -3,7 +3,8 @@ build/
 bin/
 lib/
 out/
-dist/
+dist/*
+!dist/FilmNegInvert.ofx
 package/
 
 # Visual Studio
@@ -33,6 +34,7 @@ package/
 *.ofx.bundle/Contents/MacOS/
 *.ofx.bundle/Win64/
 *.ofx.bundle/Linux-x86-64/
+!dist/FilmNegInvert.ofx
 
 # Distribution packages
 *.zip
@@ -52,5 +54,6 @@ dev/openfx/
 AGENTS.md
 CHANGELOG.md
 
-# Temporary scripts
+# Development-only helpers
+scripts/
 fix_cuda.ps1

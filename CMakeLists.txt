@@ -1,138 +1,99 @@
-cmake_minimum_required(VERSION 3.18)
+#
+# ══════════════════════════════════════════════════════════════════════════════
+#  FILM NEG INVERT 1.1.0 - CMAKELISTS.TXT
+#  CMake build script for the Film Neg Invert OFX plugin.
+#  CMAKE
+# ══════════════════════════════════════════════════════════════════════════════
+# Taller Lab - 2026
+# https://tallerlab.com/
+# VAI CORINTHIANS!!
+# ══════════════════════════════════════════════════════════════════════════════
+#
 
-project(FilmNegInvert LANGUAGES CXX)
+# ===========================================
+# 1. PROJECT SETUP # Basic project configuration
+# ===========================================
+cmake_minimum_required(VERSION 3.10)
+project(TallerNegInvert VERSION 1.1.0 LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 17)
+# ===========================================
+# 2. COMPILER SETTINGS # C++ standard and properties
+# ===========================================
+set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Configuration for OpenFX SDK
-# Priority: 1. OFX_ROOT environment variable or CMake variable
-#            2. Local dev/openfx directory (legacy, not recommended)
-#            3. Default C:/Dev/openfx
-if(DEFINED OFX_ROOT)
-    message(STATUS "Using OpenFX SDK from OFX_ROOT: ${OFX_ROOT}")
-elseif(EXISTS "${CMAKE_SOURCE_DIR}/dev/openfx")
-    set(OFX_ROOT "${CMAKE_SOURCE_DIR}/dev/openfx")
-    message(WARNING "Using local OpenFX SDK at: ${OFX_ROOT}")
-    message(WARNING "Consider moving SDK to external location (e.g., C:/Dev/openfx)")
-    message(WARNING "and configure with: cmake .. -DOFX_ROOT=C:/Dev/openfx")
-else()
-    set(OFX_ROOT "C:/dev/openfx")
-    message(STATUS "OFX_ROOT not defined. Defaulting to: ${OFX_ROOT}")
-    message(STATUS "To specify custom location: cmake .. -DOFX_ROOT=/path/to/openfx")
-endif()
-
-set(OFX_INCLUDE_DIR "${OFX_ROOT}/include")
-set(OFX_SUPPORT_DIR "${OFX_ROOT}/Support")
-
-# Check if OpenFX headers are found
-if(NOT EXISTS "${OFX_INCLUDE_DIR}/ofxCore.h")
-    message(WARNING "OpenFX headers not found at ${OFX_INCLUDE_DIR}. Please ensure OpenFX SDK is downloaded to dev/openfx or set OFX_ROOT.")
-endif()
-
-# Include directories
-include_directories(
-    "${CMAKE_SOURCE_DIR}/include"
-    "${OFX_INCLUDE_DIR}"
-    "${OFX_SUPPORT_DIR}/include"
-)
-
-# Add standard library include path for MSVC
 if(MSVC)
-    include_directories("C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/include")
-    include_directories("C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/ucrt")
-    include_directories("C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/shared")
-    include_directories("C:/Program Files (x86)/Windows Kits/10/Include/10.0.26100.0/um")
-    
-    # Add Windows SDK library paths
-    link_directories("C:/Program Files (x86)/Windows Kits/10/Lib/10.0.26100.0/um/x64")
-    link_directories("C:/Program Files (x86)/Windows Kits/10/Lib/10.0.26100.0/ucrt/x64")
-    
-    # Add Visual C++ library paths
-    link_directories("C:/Program Files/Microsoft Visual Studio/18/Community/VC/Tools/MSVC/14.50.35717/lib/x64")
+    foreach(flag_var
+            CMAKE_C_FLAGS CMAKE_C_FLAGS_DEBUG CMAKE_C_FLAGS_RELEASE CMAKE_C_FLAGS_MINSIZEREL CMAKE_C_FLAGS_RELWITHDEBINFO
+            CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_DEBUG CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_MINSIZEREL CMAKE_CXX_FLAGS_RELWITHDEBINFO)
+        if(${flag_var} MATCHES "/MDd")
+            string(REGEX REPLACE "/MDd" "/MTd" ${flag_var} "${${flag_var}}")
+        endif()
+        if(${flag_var} MATCHES "/MD")
+            string(REGEX REPLACE "/MD" "/MT" ${flag_var} "${${flag_var}}")
+        endif()
+    endforeach()
 endif()
 
-# Source files
+# ===========================================
+# 3. INCLUDE DIRECTORIES # Header search paths
+# ===========================================
+include_directories(include)
+include_directories(external/openfx/include)
+include_directories(external/openfx/Support/include)
+
+# ===========================================
+# 4. SOURCE FILES # Collect all .cpp files
+# ===========================================
 set(SOURCES
-    src/FilmNegInvertPlugin.cpp
-    src/FilmNegInvertPluginFactory.cpp
-    src/mainEntry.cpp
-    # OpenFX Support Library sources (header-only approach)
-    ${OFX_SUPPORT_DIR}/Library/ofxsCore.cpp
-    ${OFX_SUPPORT_DIR}/Library/ofxsImageEffect.cpp
-    ${OFX_SUPPORT_DIR}/Library/ofxsInteract.cpp
-    ${OFX_SUPPORT_DIR}/Library/ofxsLog.cpp
-    ${OFX_SUPPORT_DIR}/Library/ofxsMultiThread.cpp
-    ${OFX_SUPPORT_DIR}/Library/ofxsParams.cpp
-    ${OFX_SUPPORT_DIR}/Library/ofxsProperty.cpp
-    ${OFX_SUPPORT_DIR}/Library/ofxsPropertyValidation.cpp
+    "src/FilmNegInvertPlugin.cpp"
+    "src/FilmNegInvertPluginFactory.cpp"
+    "src/mainEntry.cpp"
+    "external/openfx/Support/Library/ofxsCore.cpp"
+    "external/openfx/Support/Library/ofxsImageEffect.cpp"
+    "external/openfx/Support/Library/ofxsInteract.cpp"
+    "external/openfx/Support/Library/ofxsLog.cpp"
+    "external/openfx/Support/Library/ofxsMultiThread.cpp"
+    "external/openfx/Support/Library/ofxsParams.cpp"
+    "external/openfx/Support/Library/ofxsProperty.cpp"
+    "external/openfx/Support/Library/ofxsPropertyValidation.cpp"
 )
 
-# Define the plugin library
-add_library(FilmNegInvert SHARED
-    ${SOURCES}
-)
+# ===========================================
+# 5. LIBRARY TARGET # Define the shared library
+# ===========================================
+add_library(TallerNegInvert SHARED ${SOURCES})
 
-# Windows specific settings for OpenFX
+# ===========================================
+# 6. MODULE DEFINITION # Link the .def file for Windows DLL exports
+# ===========================================
 if(WIN32)
-    set_target_properties(FilmNegInvert PROPERTIES
-        SUFFIX ".ofx"
-        PREFIX ""
-        WINDOWS_EXPORT_ALL_SYMBOLS ON
-    )
-    
-    # Installation / Bundle Structure
-    set(BUNDLE_NAME "FilmNegInvert.ofx.bundle")
-    set(PLUGIN_INSTALL_DIR "C:/Program Files/Common Files/OFX/Plugins/${BUNDLE_NAME}/Contents/Win64")
-    
-    # Post-build command to copy the binary to the bundle structure
-    # Note: This requires running VS as Admin or having write permissions to Program Files
-    # If not, user should manually copy.
-    add_custom_command(TARGET FilmNegInvert POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${PLUGIN_INSTALL_DIR}"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:FilmNegInvert> "${PLUGIN_INSTALL_DIR}/FilmNegInvert.ofx"
-        COMMENT "Installing OpenFX Plugin to ${PLUGIN_INSTALL_DIR}"
+    set_target_properties(TallerNegInvert PROPERTIES
+        LINK_FLAGS "/DEF:\"${CMAKE_SOURCE_DIR}/TallerNegInvert.def\""
     )
 endif()
 
-# ============================================
-# 6. INSTALL TARGET # Alvo de instalação
-# ============================================
-# Instalação automática para o diretório OFX padrão do Windows
-set(OFX_INSTALL_DIR "C:/Program Files/Common Files/OFX/Plugins")
-set(BUNDLE_FULL_NAME "FilmNegInvert.ofx.bundle")
-set(PLUGIN_INSTALL_FULL_PATH "${OFX_INSTALL_DIR}/${BUNDLE_FULL_NAME}/Contents/Win64")
-
-# Comando de instalação (requer privilégios de administrador)
-install(TARGETS FilmNegInvert
-    RUNTIME DESTINATION "${PLUGIN_INSTALL_FULL_PATH}"
-    LIBRARY DESTINATION "${PLUGIN_INSTALL_FULL_PATH}"
+# ===========================================
+# 7. OUTPUT # Set output directory for the library
+# ===========================================
+set_target_properties(TallerNegInvert PROPERTIES
+    OUTPUT_NAME "FilmNegInvert"
+    SUFFIX ".ofx"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
 )
 
-# Também instala com nome correto no bundle
-install(FILES "$<TARGET_FILE:FilmNegInvert>"
-    DESTINATION "${PLUGIN_INSTALL_FULL_PATH}"
-    RENAME "FilmNegInvert.ofx"
-    OPTIONAL
+add_custom_command(TARGET TallerNegInvert POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/lib/Resources"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${CMAKE_SOURCE_DIR}/Resources/com.tallerneg.FilmNegInvert.png"
+            "${CMAKE_BINARY_DIR}/lib/Resources/com.tallerneg.FilmNegInvert.png"
 )
 
-# ============================================
-# 7. CUSTOM TARGETS # Alvos personalizados
-# ============================================
-# Alvo para instalação rápida (sem build)
-add_custom_target(install-plugin
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${PLUGIN_INSTALL_FULL_PATH}"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:FilmNegInvert> "${PLUGIN_INSTALL_FULL_PATH}/FilmNegInvert.ofx"
-    COMMENT "Installing FilmNegInvert plugin to ${PLUGIN_INSTALL_FULL_PATH}"
-    DEPENDS FilmNegInvert
-)
-
-# Alvo para criar pacote de distribuição
-add_custom_target(package-plugin
-    COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/package/${BUNDLE_FULL_NAME}/Contents/Win64"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:FilmNegInvert> "${CMAKE_BINARY_DIR}/package/${BUNDLE_FULL_NAME}/Contents/Win64/FilmNegInvert.ofx"
-    COMMAND ${CMAKE_COMMAND} -E echo "Package created at: ${CMAKE_BINARY_DIR}/package/${BUNDLE_FULL_NAME}"
-    COMMENT "Creating OFX bundle package"
-    DEPENDS FilmNegInvert
-)
+#
+# ══════════════════════════════════════════════════════════════════════════════
+#  END OF FILE
+# ══════════════════════════════════════════════════════════════════════════════
+#
